@@ -10,7 +10,7 @@ def monmode():
   print("Running wlan0mon")
   time.sleep(2)
   print("killing processes and entering monitor mode")
-  intface = "wlan0"
+  intface = "wlan0mon"
   subprocess.Popen(["sudo", "airmon-ng", "start", "wlan0mon"],stdout=subprocess.DEVNULL)
   subprocess.Popen(["sudo", "airmon-ng", "check", "kill"],stdout=subprocess.DEVNULL)
 monmode()
