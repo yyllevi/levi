@@ -26,6 +26,7 @@ def handshake():
  seen_essids = set()
  os.system("clear")
  threading.Timer(50, handshake).start()
+ print("\nRESCANNING IN 50 SECONDS\n")
  print("\n\033[0;35mPLEASE WAIT... AS SOON AS SSIDS POP UP IT WILL START ATTACKING\n ")
  print("\r                       ALL WIFIS TO ATTACK ")
  print("\r   ATTACKING")
