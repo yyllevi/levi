@@ -3,7 +3,7 @@ import os
 import time
 import subprocess
 import csv
-
+# random deauth script just put on github for testing its a pretty shit script cause i didn't makeit target 1 network then target the next it will do the same 1 but i will maybe make it do that later
 
 def monmode():
   global intface
